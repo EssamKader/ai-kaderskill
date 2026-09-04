@@ -25,6 +25,7 @@ Then **stop and wait** for the user's reply before starting the next phase. Neve
 - Confirm a context file exists (e.g. `CONTEXT.md`) and read it if present. If it doesn't exist and the project has meaningful standing rules or conventions, offer to create one — ask the user what belongs in it rather than guessing.
 - **Default tracker: GitHub Issues on that repo**, not local ticket files — tickets become issues (`gh issue create`), triage labels become real GitHub labels, and "close the ticket" in every later phase means closing the issue (`gh issue close`), not editing a `label:` line in a markdown file. Confirm this default with the user rather than assuming silently; fall back to local files or Linear only if the user prefers that or no GitHub repo is in play for this project. Either way, confirm that these five triage labels exist: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Create any missing ones (`gh label create` for GitHub Issues).
 - If any MCP servers or external tools are required for this project, confirm they're connected/toggled on before proceeding.
+- **If the repo is public on GitHub, set up branch protection on the default branch** (`gh api .../branches/<default>/protection`): require pull requests with at least 1 approving review, disable force-pushes and branch deletion. Leave `enforce_admins` off so the project owner can keep pushing directly after an in-conversation review — protection exists to gate outside contributors and guard against accidental force-push/deletion, not to add ceremony to the owner's own already-reviewed changes. Skip this for a private/solo-only repo unless the user asks for it anyway.
 
 ## Phase 1 — Scope the task
 
@@ -74,8 +75,17 @@ For the next `ready-for-agent` ticket:
 
 - Run `/code-review` (or the project's configured review step) on the returned change before anything is committed.
 - If it fails, delegate the fix back to the same subagent with the specific review comments — don't fix it yourself.
-- On pass: close the ticket, and go back to Phase 5 to triage/pick the next ticket.
+- On pass: close the ticket, and go back to Phase 5 to triage/pick the next ticket. **Closing a ticket does not by itself cut a release** — see "Versioning & Release" below.
 - If no `ready-for-agent` or `needs-triage` tickets remain, tell the user the cycle is complete and summarize what was closed.
+
+## Versioning & Release (applies whenever this project's code is deployed anywhere outside the repo itself — an installed extension, a published package, a running service)
+
+A merge to the default branch means "the code exists," not "this is safe to deploy." Keep those two separate, deliberate steps:
+
+- Maintain a `CHANGELOG.md` at the project root, one entry per release, listing which tickets/issues it closes.
+- Only cut a version tag (semantic versioning, e.g. `v0.5.0`) and a GitHub Release once a batch of closed tickets has actually been verified and the user wants to deploy — never tag automatically just because a ticket closed; ask first, same as any other hard-to-reverse/public action.
+- Treat the tagged release, not the default branch's HEAD, as the only thing that's "safe to install/deploy" — when copying code to a live install (a deployed extension, a running service, etc.), deploy from a tagged commit, not from whatever HEAD happens to be at the time.
+- For any code that can't be executed or unit-tested in this environment (e.g. IronPython/pyRevit code with no live host available, or any other host-dependent runtime), require a standalone verification write-up — a mock-object simulation proving the logic — before a ticket touching that logic can close in Phase 7. This is the actual safety net when the real runtime isn't reachable, not optional polish.
 
 ## Throughout
 

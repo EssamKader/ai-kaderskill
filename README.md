@@ -50,6 +50,10 @@ picks it up automatically when it matches).
 - **Phase 6 (Implement)**: delegates the actual coding to a subagent, never writes it inline.
 - **Phase 7 (Review)**: runs a real review step before anything is closed; failures go back
   to the same subagent with specific comments, not a silent rewrite.
+- **Versioning & Release**: a merge is not a deploy. Closed tickets accumulate on the default
+  branch until you deliberately cut a version tag and GitHub Release — that tag, not the
+  branch's HEAD, is the only thing treated as safe to install or deploy. Public repos also get
+  branch protection by default (PRs + 1 approval for anyone but the owner, no force-push/delete).
 
 ## See it in action
 
