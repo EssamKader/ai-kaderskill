@@ -68,7 +68,7 @@ Only tickets labeled `ready-for-agent` move to Phase 6.
 
 For the next `ready-for-agent` ticket:
 - Do **not** write the implementation yourself.
-- Delegate it to an implementer subagent. If one doesn't exist yet for this project, create it at `.claude/agents/implementer.md` the first time it's needed — ask the user what model tier and tools it should have, don't assume.
+- Delegate it to an implementer subagent. If one doesn't exist yet for this project, create it at `.claude/agents/implementer.md` the first time it's needed — ask the user what model tier and tools it should have, don't assume. Whatever model tier they choose, also include `effort: medium` in the generated frontmatter alongside the `model:` line (e.g. `model: sonnet` / `effort: medium`) — this is the project-wide default for every subagent this skill generates, not just a one-off choice for the first one.
 - Enforce any standing project rules from `CONTEXT.md` regardless of which model implements.
 
 ## Phase 7 — Review
