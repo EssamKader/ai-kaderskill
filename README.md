@@ -5,7 +5,7 @@ packaged as a reusable **skill**. Instead of one long unstructured conversation 
 directly into code, ai-kaderskill runs every feature or task through a fixed pipeline:
 
 ```
-Setup → Scope → Wayfinder → To-Spec → To-Tickets → Triage → Implement → Review
+Setup → Scope → Advisor Strategy → Wayfinder → To-Spec → To-Tickets → Triage → Implement → Review
 ```
 
 At the end of every phase, it tells you exactly what just happened and what happens next,
@@ -38,17 +38,21 @@ picks it up automatically when it matches).
   the project needs one.
 - **Phase 1 (Scope)**: decides whether what you're asking for is small and clear (skip
   straight to spec) or big/ambiguous (needs Wayfinder first).
-- **Phase 2 (Wayfinder)**: only for ambiguous work — breaks the ambiguity into decision
+- **Phase 2 (Advisor Strategy)**: only for ambiguous work, right before Wayfinder — runs a
+  `/consult`-style model advisor on the task so you know which model tier suits the ambiguity
+  you're about to spend effort resolving, before that effort is spent. Purely advisory, and
+  skipped entirely on the small/clear path.
+- **Phase 3 (Wayfinder)**: only for ambiguous work — breaks the ambiguity into decision
   tickets (Research/Grill/Prototype/Routine/Manual) and resolves them one at a time, asking
   you directly for anything only you can decide.
-- **Phase 3 (To-Spec)**: turns resolved decisions into a spec of user stories, confirmed with
+- **Phase 4 (To-Spec)**: turns resolved decisions into a spec of user stories, confirmed with
   you before anything gets built.
-- **Phase 4 (To-Tickets)**: splits the spec into tracer-bullet tickets with explicit
+- **Phase 5 (To-Tickets)**: splits the spec into tracer-bullet tickets with explicit
   dependencies.
-- **Phase 5 (Triage)**: labels every ticket — ready for an agent, ready for a human, missing
+- **Phase 6 (Triage)**: labels every ticket — ready for an agent, ready for a human, missing
   info, or out of scope — never guesses.
-- **Phase 6 (Implement)**: delegates the actual coding to a subagent, never writes it inline.
-- **Phase 7 (Review)**: runs a real review step before anything is closed; failures go back
+- **Phase 7 (Implement)**: delegates the actual coding to a subagent, never writes it inline.
+- **Phase 8 (Review)**: runs a real review step before anything is closed; failures go back
   to the same subagent with specific comments, not a silent rewrite.
 - **Versioning & Release**: a merge is not a deploy. Closed tickets accumulate on the default
   branch until you deliberately cut a version tag and GitHub Release — that tag, not the
