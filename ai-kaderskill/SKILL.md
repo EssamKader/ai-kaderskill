@@ -38,8 +38,8 @@ State which path you're taking and why in the "Next" message.
 ## Phase 2 — Advisor Strategy (only if routing to Wayfinder)
 
 - Run `/consult` (the strategic model-advisor command) with a short description of the task and why Phase 1 classified it as big/ambiguous.
-- Present the resulting Consult Report to the user in full before spending any effort on Wayfinder's own decomposition — recommended model, reasoning, token strategy, and the suggested start prompt.
-- This is advisory, not a gate: the user may switch models via `/model`, or just say to proceed with the current one. Never choose or switch the model on the user's behalf.
+- Present the resulting Consult Report to the user in full before spending any effort on Wayfinder's own decomposition — it covers the main conversation thread and any subagent that will later be delegated to (Phase 7) separately, since they often warrant different tiers.
+- This is advisory, not a gate: the user may switch models via `/model` (main thread) or by editing an agent's `model:` frontmatter (subagent), or just say to proceed as-is. Never choose or switch a model on the user's behalf. If a forced subagent override (`CLAUDE_CODE_SUBAGENT_MODEL_FORCE`) conflicts with the recommendation, say so plainly rather than silently deferring to it.
 - Skipped entirely on the small/already-clear path — that path never sees Wayfinder-scale ambiguity in the first place.
 - `/consult` is a personal command, not bundled with this skill — if it isn't available in this environment, say so plainly and skip straight to Phase 3 rather than asking the user to install a specific command.
 
