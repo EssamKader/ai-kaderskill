@@ -39,7 +39,13 @@ State which path you're taking and why in the "Next" message.
 
 - Run `/consult` (the strategic model-advisor command) with a short description of the task and why Phase 1 classified it as big/ambiguous.
 - Present the resulting Consult Report to the user in full before spending any effort on Wayfinder's own decomposition — it covers the main conversation thread and any subagent that will later be delegated to (Phase 7) separately, since they often warrant different tiers.
-- This is advisory, not a gate: the user may switch models via `/model` (main thread) or by editing an agent's `model:` frontmatter (subagent), or just say to proceed as-is. Never choose or switch a model on the user's behalf. If a forced subagent override (`CLAUDE_CODE_SUBAGENT_MODEL_FORCE`) conflicts with the recommendation, say so plainly rather than silently deferring to it.
+- This is advisory, not a gate: proceed as-is unless the user explicitly accepts a recommendation. Never choose or switch a model on the user's behalf.
+- **Main-thread acceptance**: the user runs `/model` and/or `/effort` themselves — always session-scoped by nature, nothing else to do.
+- **Subagent acceptance — ask which scope, default to the narrowest if they don't say:**
+  - *This conversation only (default, no files touched)*: pass the accepted model explicitly via the Agent tool's own `model` parameter on every subagent call made in this conversation from here on. This overrides both an agent's frontmatter and any global default, and leaves zero trace once the conversation ends.
+  - *This project only, persists across future chats here*: add or edit a project-level `.claude/settings.json` (shared) or `.claude/settings.local.json` (personal) with its own `env` override for `CLAUDE_CODE_SUBAGENT_MODEL` — this shadows the user's global setting only inside this project.
+  - *Every project (rare — confirm this is really what they want)*: edit the global `~/.claude/settings.json` directly.
+  - **Do not "fix" this by editing an individual agent file's `model:` line** — if a global `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` is set, that edit is silently ignored at runtime; say so rather than making a change that won't take effect.
 - Skipped entirely on the small/already-clear path — that path never sees Wayfinder-scale ambiguity in the first place.
 - `/consult` is a personal command, not bundled with this skill — if it isn't available in this environment, say so plainly and skip straight to Phase 3 rather than asking the user to install a specific command.
 
