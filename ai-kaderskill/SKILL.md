@@ -64,6 +64,7 @@ State which path you're taking and why in the "Next" message.
 ## Phase 5 — To-Tickets
 
 - Split the confirmed spec into tracer-bullet tickets. Each ticket must declare its own blocking dependencies on other tickets explicitly.
+- **Each ticket's body must name the specific files/modules relevant to it, and state any scope boundary explicitly (e.g. "do not read or modify files outside X unless this ticket requires a cross-cutting check").** The Phase 7 implementer subagent inherits nothing from this orchestrating conversation — only the ticket text itself. A ticket without an explicit file list forces the implementer to either guess or over-read to find its own scope; write the scope down here, once, instead of letting every implementation rediscover it. If the ticket depends on a decision or convention recorded elsewhere (a prior ticket, a project doc), cite it by name/path rather than restating it — but always name it, don't assume the implementer will find it unprompted.
 - Open them as real tickets on the configured tracker.
 - Every new ticket starts labeled `needs-triage`.
 
@@ -88,6 +89,7 @@ For the next `ready-for-agent` ticket:
 ## Phase 8 — Review
 
 - Run `/code-review` (or the project's configured review step) on the returned change before anything is committed.
+- **If the change claims to avoid, not depend on, or not reuse something, verify that claim against actual resolved behavior — not just by reading the new file's own source text.** A file can satisfy a "does not import X" or "does not depend on Y" claim in its own code while still pulling X or Y in transitively through something it does import. Where the language/runtime allows it (e.g. import the module and inspect what actually loaded), check it that way; where it can't be executed directly, the verification write-up required below must say explicitly that it traced the full dependency chain, not just the changed file.
 - If it fails, delegate the fix back to the same subagent with the specific review comments — don't fix it yourself.
 - On pass: close the ticket, and go back to Phase 6 to triage/pick the next ticket. **Closing a ticket does not by itself cut a release** — see "Versioning & Release" below.
 - If no `ready-for-agent` or `needs-triage` tickets remain, tell the user the cycle is complete and summarize what was closed.
@@ -99,7 +101,7 @@ A merge to the default branch means "the code exists," not "this is safe to depl
 - Maintain a `CHANGELOG.md` at the project root, one entry per release, listing which tickets/issues it closes.
 - Only cut a version tag (semantic versioning, e.g. `v0.5.0`) and a GitHub Release once a batch of closed tickets has actually been verified and the user wants to deploy — never tag automatically just because a ticket closed; ask first, same as any other hard-to-reverse/public action.
 - Treat the tagged release, not the default branch's HEAD, as the only thing that's "safe to install/deploy" — when copying code to a live install (a deployed extension, a running service, etc.), deploy from a tagged commit, not from whatever HEAD happens to be at the time.
-- For any code that can't be executed or unit-tested in this environment (e.g. IronPython/pyRevit code with no live host available, or any other host-dependent runtime), require a standalone verification write-up — a mock-object simulation proving the logic — before a ticket touching that logic can close in Phase 8 (Review). This is the actual safety net when the real runtime isn't reachable, not optional polish.
+- For any code that can't be executed or unit-tested in this environment (e.g. IronPython/pyRevit code with no live host available, or any other host-dependent runtime), require a standalone verification write-up — a mock-object simulation proving the logic — before a ticket touching that logic can close in Phase 8 (Review). This is the actual safety net when the real runtime isn't reachable, not optional polish. **The write-up must state which side it actually verified — reads (state inspection, orientation, lookups) versus writes (creating/persisting new state) are different classes of risk, and a mock or a rolled-back test transaction proving reads work says nothing about write behavior. Don't let a read-only proof be cited as covering a ticket whose real risk is a write.**
 
 ## Throughout
 
